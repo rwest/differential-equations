@@ -33,6 +33,8 @@
 # the tolerance table, the stiff example, and the jupytext pairing.*
 
 # %%
+import time
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
@@ -148,6 +150,12 @@ for rtol in [1e-3, 1e-4, 1e-6, 1e-8, 1e-10]:
 # the error once $c$ falls below about 0.01? Why?
 
 # %%
+print(f"{'rtol':>8} {'atol':>8} {'nfev':>6} {'steps':>6} {'rel. error at t=10':>20}")
+for rtol in [1e-3, 1e-4, 1e-6, 1e-8, 1e-10]:
+    atol = 1e-2
+    sol = solve_ivp(dcdt, t_span, c0, rtol=rtol, atol=atol)
+    rel_err = (sol.y[0, -1] - np.exp(-k * 10)) / np.exp(-k * 10)
+    print(f"{rtol:8.0e} {atol:8.0e} {sol.nfev:6d} {len(sol.t):6d} {rel_err:20.1e}")
 
 # %% [markdown]
 # ## 3. Getting the answer at the times *you* want
@@ -247,11 +255,13 @@ def abc(t, y, ka, kb):
 
 
 kb = 0.5
-print(f"{'ka':>8} {'method':>7} {'nfev':>9} {'B(10)':>10}")
+print(f"{'ka':>8} {'method':>7} {'nfev':>9} {'time (s)':>9} {'B(10)':>10}")
 for ka in [20, 1e3, 1e5]:
     for method in ["RK45", "BDF", "LSODA"]:
+        start = time.perf_counter()
         sol = solve_ivp(abc, (0, 10), [1.0, 0.0, 0.0], args=(ka, kb), method=method)
-        print(f"{ka:8.0e} {method:>7} {sol.nfev:9d} {sol.y[1, -1]:10.6f}")
+        elapsed = time.perf_counter() - start
+        print(f"{ka:8.0e} {method:>7} {sol.nfev:9d} {elapsed:9.3f} {sol.y[1, -1]:10.6f}")
 
 # %% [markdown]
 # Notes on that cell:
