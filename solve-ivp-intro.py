@@ -64,8 +64,7 @@ from scipy.integrate import solve_ivp
 # $k = 0.5$. The exact answer is $c(t) = e^{-kt}$.
 
 # %%
-k = 0.5
-
+k = 0.05
 
 def dcdt(t, c):
     "The right-hand side, dc/dt = -k c"
